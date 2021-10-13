@@ -4,6 +4,23 @@ interface HasAddressOfOrder {
 
 open class AddressOfOrder(addressOfOrder: String) : HasAddressOfOrder {
     override var address: String = addressOfOrder
+        set(value) {
+            if (value != "")
+                field = value
+        }
+}
+
+class InputAddressOfOrder {
+    fun input(): AddressOfOrder {
+        var address: String
+        do {
+            println("Введите адрес")
+            address = readLine().toString().trim()
+            if (!correctInputNameSurnamePatronymic(address))
+                println("Вы ввели некорректное имя")
+        } while(address == "")
+        return AddressOfOrder(address)
+    }
 }
 
 interface HasDiscount {
@@ -13,17 +30,20 @@ interface HasDiscount {
 open class DiscountOfOrder(discountOfOrder: Int) : HasDiscount {
     override var discount: Int = discountOfOrder
 }
+
 fun correctInputDiscountOfOrder(discountOfOrder: Int) : Boolean {
     return discountOfOrder in 0..100
 }
+
 fun errorOutputAboutIncorrectDiscount() {
     println("Вы ввели некорректную скидку")
 }
+
 class InputDiscountOfOrder {
     fun input(): DiscountOfOrder {
         var discountOfOrder: Int?
         do {
-            println("Введите скидку за товар")
+            println("Введите скидку за товар в процентах")
             val str = readLine().toString()
             discountOfOrder = str.toIntOrNull()
             if (discountOfOrder != null) {
@@ -115,7 +135,7 @@ class InputPerson {
         } while (surname == "" || !correctInputNameSurnamePatronymic(surname))
         do {
             println("Введите отчество или  напишите '$absenceOfPatronymic' при его отсутствии")
-            patronymic = readLine().toString()
+            patronymic = readLine().toString().trim()
             if (!correctInputNameSurnamePatronymic(surname))
                 println("Вы ввели некорректное отчество")
         } while (surname == "" || surname == absenceOfPatronymic || !correctInputNameSurnamePatronymic(patronymic))
@@ -125,13 +145,15 @@ class InputPerson {
     }
 }
 
-class PrintAllAboutOrder {
-    fun print(ListOfPeopleOrder: ArrayList<String>, ListOfCostInformation: ArrayList<Double>, ListOfDiscountInformation: ArrayList<Int>) {
+class PrintAboutOrder {
+    fun print(ListOfPeopleOrder: ArrayList<String>, ListOfCostInformation: ArrayList<Double>,
+              ListOfDiscountInformation: ArrayList<Int>, ListOfAddress: ArrayList<String>) {
         println("Вывод всей информации")
         for (i in ListOfPeopleOrder.indices) {
-            print(ListOfPeopleOrder[i] + " ")
-            print(ListOfCostInformation[i].toString() + " ")
-            println(ListOfDiscountInformation[i])
+            print("ФИО: " + ListOfPeopleOrder[i] + " ")
+            print("Стоимость: " + ListOfCostInformation[i].toString() + " ")
+            print("Скидка в процентах: " + ListOfDiscountInformation[i] + "%")
+            println("Адрес: " + ListOfAddress[i])
         }
     }
 }
@@ -139,17 +161,18 @@ class PrintAllAboutOrder {
 const val absenceOfPatronymic = "отмена"
 const val valueOfExitingProgram = 0
 const val valueToAdd = 1
-const val OutputOfAllRecords = 2
+const val OutputOfRecords = 2
 
 fun main() {
-    var choosingAction: Int? = valueOfExitingProgram
+    var choosingAction: Int? = -1
     val listOfPerson : ArrayList<String> = arrayListOf()
     val listOfCost : ArrayList<Double> = arrayListOf()
     val listOfDiscount : ArrayList<Int> = arrayListOf()
+    val listOfAddressOfOrder : ArrayList<String> = arrayListOf()
     println("База данных заказов Интернет-магазина")
     while (choosingAction != valueOfExitingProgram) {
         println("Напишите - ${valueToAdd}, если хотите добавить запись")
-        println("Напишите - ${OutputOfAllRecords}, если хотите вывести все записи")
+        println("Напишите - ${OutputOfRecords}, если хотите вывести все записи")
         println("Напишите - ${valueOfExitingProgram}, если хотите вывести все записи")
         val str = readLine()
         choosingAction = str?.toIntOrNull()
@@ -158,19 +181,27 @@ fun main() {
                 val inputPerson = InputPerson()
                 val resultInputPerson = inputPerson.input()
                 val person = Person(resultInputPerson.name, resultInputPerson.surname, resultInputPerson.patronymic)
+
                 val inputCostOfOrder = InputCostOfOrder()
                 val resultInputCostOfOrder = inputCostOfOrder.input()
                 val costOfOrder = CostOfOrder(resultInputCostOfOrder.cost)
+
                 val inputDiscountOfOrder = InputDiscountOfOrder()
                 val resultInputDiscountOfOrder = inputDiscountOfOrder.input()
                 val discountOfOrder = DiscountOfOrder(resultInputDiscountOfOrder.discount)
+
+                val inputAddressOfOrder = InputAddressOfOrder()
+                val resultInputAddressOfOrder = inputAddressOfOrder.input()
+                val addressOfOrder = AddressOfOrder(resultInputAddressOfOrder.address)
+
                 listOfPerson.add(person.name + " " + person.surname + " " + person.patronymic)
                 listOfCost.add(costOfOrder.cost)
                 listOfDiscount.add(discountOfOrder.discount)
+                listOfAddressOfOrder.add(addressOfOrder.address)
             }
-            else if (choosingAction == OutputOfAllRecords) {
-                val printAllAboutOrder = PrintAllAboutOrder()
-                printAllAboutOrder.print(listOfPerson, listOfCost, listOfDiscount)
+            else if (choosingAction == OutputOfRecords) {
+                val printAboutOrder = PrintAboutOrder()
+                printAboutOrder.print(listOfPerson, listOfCost, listOfDiscount, listOfAddressOfOrder)
             }
         } else println("Вы ввели не число")
     }
