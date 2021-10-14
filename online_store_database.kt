@@ -156,8 +156,8 @@ fun validationNameSurnamePatronymicOfOrder() : Person { //Функция вал�
         resultInputPatronymicOfOrder = inputPerson.inputPatronymic()
         if (!inputCorrectNameSurnamePatronymic(resultInputPatronymicOfOrder))
             println("Вы ввели некорректное отчество")
-    } while (resultInputPatronymicOfOrder == "" || resultInputPatronymicOfOrder != absenceOfPatronymic || !inputCorrectNameSurnamePatronymic(resultInputPatronymicOfOrder))
-    if (resultInputPatronymicOfOrder == absenceOfPatronymic)
+    } while (resultInputPatronymicOfOrder == "" && resultInputPatronymicOfOrder == cancellationAction || !inputCorrectNameSurnamePatronymic(resultInputPatronymicOfOrder))
+    if (resultInputPatronymicOfOrder == cancellationAction)
         resultInputPatronymicOfOrder = ""
     return Person(resultInputNameOfOrder, resultInputSurnameOfOrder, resultInputPatronymicOfOrder)
 }
@@ -172,7 +172,7 @@ class InputPerson {
         return readLine().toString().trim()
     }
     fun inputPatronymic() : String { //Ввод отчества заказчика
-        println("Введите отчество или  напишите '$absenceOfPatronymic' при его отсутствии")
+        println("Введите отчество или  напишите '$cancellationAction' при его отсутствии")
         return readLine().toString().trim()
     }
 }
@@ -182,7 +182,7 @@ class PrintAboutOrder {
               ListOfDiscountInformation: ArrayList<Int>, ListOfAddress: ArrayList<String>) { //Функция вывода всей информации в базе данных
         println("Вывод всей информации")
         for (i in ListOfPeopleOrder.indices) {
-            print("ФИО: " + ListOfPeopleOrder[i] + " ")
+            print(ListOfPeopleOrder.indexOf(ListOfPeopleOrder[i]).toString() + ") " + "ФИО: " + ListOfPeopleOrder[i] + " ")
             print("Стоимость: " + ListOfCostInformation[i].toString() + " ")
             print("Скидка в процентах: " + ListOfDiscountInformation[i] + "% ")
             println("Адрес: " + ListOfAddress[i])
@@ -190,7 +190,17 @@ class PrintAboutOrder {
     }
 }
 
-const val absenceOfPatronymic = "отмена"
+class DeleteOrder {
+    fun delete(indexForDelete: Int, ListOfPeopleOrder: ArrayList<String>, ListOfCostInformation: ArrayList<Double>,
+               ListOfDiscountInformation: ArrayList<Int>, ListOfAddress: ArrayList<String>){
+        ListOfPeopleOrder.removeAt(indexForDelete)
+        ListOfCostInformation.removeAt(indexForDelete)
+        ListOfDiscountInformation.removeAt(indexForDelete)
+        ListOfAddress.removeAt(indexForDelete)
+    }
+}
+
+const val cancellationAction = "отмена"
 const val valueNeutral = -1
 const val valueOfExitingProgram = 0
 const val valueToAdd = 1
@@ -201,7 +211,7 @@ const val valueToChangeOfRecords = 4
 fun offerToEnterActionNumber() { //Функция выбора действия с базой данных (добавление, вывод, удаление, изменение)
     println("Напишите - ${valueToAdd}, если хотите добавить запись")
     println("Напишите - ${valueToOutputOfRecords}, если хотите вывести все записи")
-    println("Напишите - ${valueToDeleteOfRecords}, если хотите вывести удалить запись")
+    println("Напишите - ${valueToDeleteOfRecords}, если хотите удалить запись")
     println("Напишите - ${valueToChangeOfRecords}, если хотите изменить запись")
     println("Напишите - ${valueOfExitingProgram}, если хотите выйти из программы")
 }
@@ -225,11 +235,34 @@ class InputOfferToEnterActionNumber {
     }
 }
 
+fun validationInputIndexToDelete(ListOfPeopleOrder: ArrayList<String>) : Int { //Функция валидации индекса списка для удаления
+    var flagListIndex = true
+    var countOfRemove: Int?
+    do {
+        val inputIndexToDelete = InputIndexToDelete()
+        countOfRemove = inputIndexToDelete.input()
+        if (countOfRemove != null)
+            if (countOfRemove == valueNeutral || countOfRemove in 0..ListOfPeopleOrder.size)
+                flagListIndex = false
+            else println("Нет номера такой записи")
+    } while (countOfRemove == null || flagListIndex)
+    return countOfRemove
+}
+
+class InputIndexToDelete {
+    fun input(): Int? { //Функция ввода индекса списка для удаления
+        println("Введите номер записи, которую вы хотите удалить или напиши '$valueNeutral' для отмены действия")
+        val stringCountOfRemove: String? = readLine()
+        return stringCountOfRemove?.toIntOrNull()
+    }
+}
+
 fun outputOfInformationDatabase() { //Функция вывода название базы данных
     println("База данных заказов Интернет-магазина")
 }
 
 fun main() {
+
     val listOfPerson : ArrayList<String> = arrayListOf()
     val listOfCost : ArrayList<Double> = arrayListOf()
     val listOfDiscount : ArrayList<Int> = arrayListOf()
@@ -264,7 +297,16 @@ fun main() {
                 printAboutOrder.print(listOfPerson, listOfCost, listOfDiscount, listOfAddressOfOrder)
             }
             valueToDeleteOfRecords -> {
-
+                val deleteOrder = DeleteOrder()
+                if (listOfPerson.size != 0) {
+                    val countOfRemove = validationInputIndexToDelete(listOfPerson)
+                    if (countOfRemove != valueNeutral) {
+                        deleteOrder.delete(countOfRemove, listOfPerson, listOfCost, listOfDiscount, listOfAddressOfOrder)
+                        println("Данные удалены")
+                    }
+                }
+                else
+                    println("Записей нет")
             }
             valueToChangeOfRecords -> {
             }
