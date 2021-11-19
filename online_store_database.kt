@@ -1,206 +1,153 @@
-interface HasAddressOfOrder {
-    var address: String
+interface IInput <T> {
+    fun input() : T?
 }
 
-open class AddressOfOrder(addressOfOrder: String) : HasAddressOfOrder {
-    override var address: String = addressOfOrder
-        set(value) {
-            if (value != "")
-                field = value
-        }
+interface IValidate <T> {
+    fun validate(value: T?) : Boolean
 }
 
-fun validationAddressOfOrder() : AddressOfOrder { //Функция валидации адреса
-    var resultInputAddressOfOrder : String
-    do {
-        val inputAddressOfOrder = InputAddressOfOrder()
-        resultInputAddressOfOrder = inputAddressOfOrder.input()
-    } while (resultInputAddressOfOrder == "")
-    return AddressOfOrder(resultInputAddressOfOrder)
+interface HasName1 {
+    var name: String?
 }
 
-class InputAddressOfOrder {
-    fun input(): String { //Функция ввод адреса доставки
-        println("Введите адрес")
-        return readLine().toString().trim()
+interface HasSurname1 {
+    var surname: String?
+}
+
+interface HasPatronymic1 {
+    var patronymic: String?
+}
+
+interface HasCost1 {
+    var cost: Double?
+}
+
+interface HasDiscount1 {
+    var discount: Int?
+}
+
+interface HasAddressOfOrder1 {
+    var address: String?
+}
+
+open class NameOfOrder1(nameOfOrder: String?) : HasName1 {
+    override var name: String? = nameOfOrder
+}
+
+open class SurnameOfOrder1(surnameOfOrder1: String?) : HasSurname1 {
+    override var surname: String? = surnameOfOrder1
+}
+
+open class PatronymicOfOrder1(patronymicOfOrder1: String?) : HasPatronymic1 {
+    override var patronymic: String? = patronymicOfOrder1
+}
+
+open class AddressOfOrder1(addressOfOrder: String?) : HasAddressOfOrder1 {
+    override var address: String? = addressOfOrder
+}
+
+open class DiscountOfOrder1(discountOfOrder: Int?) : HasDiscount1 {
+    override var discount: Int? = discountOfOrder
+}
+
+open class CostOfOrder1(discountOfOrder: Double?) : HasCost1 {
+    override var cost: Double? = discountOfOrder
+}
+
+open class OnlineStoreDataBase(
+    override var name: String?,
+    override var surname: String?,
+    override var patronymic: String?,
+    override var cost: Double?,
+    override var discount: Int?,
+    override var address: String?,
+) : HasName1,
+    HasSurname1,
+    HasPatronymic1,
+    HasCost1,
+    HasDiscount1,
+    HasAddressOfOrder1
+
+open class InputNameOrSurnameOfPatronymic : IInput<String> {
+    override fun input(): String? = readLine()
+}
+open class InputDiscount : IInput<Int>{
+    override fun input(): Int? = readLine()?.toIntOrNull()
+}
+
+open class InputCost : IInput<Double> {
+    override fun input(): Double? = readLine()?.toDoubleOrNull()
+}
+
+open class InputAddress : IInput<String> {
+    override fun input(): String? = readLine()
+}
+
+open class InputIndexToDelete1 : IInput<Int> {
+    override fun input(): Int? = readLine()?.toIntOrNull()
+}
+
+open class InputActionNumber : IInput<Int>{
+    override fun input(): Int? = readLine()?.toIntOrNull()
+}
+
+open class ValidateNameSurnamePatronymic : IValidate<String> {
+    override fun validate(value: String?) = value != null && Regex("([A-Za-zА-Яа-яёЁ]+)(([-]([A-Za-zА-Яа-яёЁ]+))?)*").matches(value)
+}
+
+open class ValidateCost : IValidate<Double> {
+    override fun validate(value: Double?): Boolean = value != null && value > 0
+}
+
+open class ValidateDiscount : IValidate<Int> {
+    override fun validate(value: Int?): Boolean =  value != null && value in 0..100
+}
+
+open class ValidateAddress : IValidate<String>{
+    override fun validate(value: String?): Boolean = value != ""
+}
+
+open class ValidateIndexForRemove : IValidate<Int> {
+    override fun validate(value: Int?): Boolean = value != null && value >= 0  && value <= listOfOnlineStoreDataBase.size - 1
+}
+
+open class ValidateActionNumber : IValidate<Int> {
+    override fun validate(value: Int?): Boolean = value != null && value in valueOfExitingProgram..valueToChangeOfRecords
+}
+
+open class LoopInput {
+    fun <T> input(prompt: String, valueInput: IInput<T>, valueValidate: IValidate<T>): T? {
+        var resultValueInput: T?
+        do {
+            print(prompt)
+            resultValueInput = valueInput.input()
+            val flagFunction: Boolean = valueValidate.validate(resultValueInput)
+        } while (!flagFunction)
+        return resultValueInput
     }
 }
 
-interface HasDiscount {
-    var discount: Int
-}
-
-open class DiscountOfOrder(discountOfOrder: Int) : HasDiscount {
-    override var discount: Int = discountOfOrder
-}
-
-fun inputCorrectDiscountOfOrder(discountOfOrder: Int) : Boolean { //Валидация скидки
-    return discountOfOrder in 0..100
-}
-
-fun outputErrorAboutIncorrectDiscount() { //Вывод ошибки при вводе скидку в процентах
-    println("Вы ввели некорректную скидку")
-}
-
-fun validationDiscountOfOrder() : DiscountOfOrder { //Функция валидации скидки
-    var resultInputDiscountOfOrder : Int?
-    do {
-        val inputDiscountOfOrder = InputDiscountOfOrder()
-        resultInputDiscountOfOrder = inputDiscountOfOrder.input()
-        if (resultInputDiscountOfOrder != null) {
-            if (!inputCorrectDiscountOfOrder(resultInputDiscountOfOrder))
-                outputErrorAboutIncorrectDiscount()
-        } else outputErrorAboutIncorrectDiscount()
-    } while (resultInputDiscountOfOrder == null || !inputCorrectDiscountOfOrder(resultInputDiscountOfOrder))
-    return DiscountOfOrder(resultInputDiscountOfOrder)
-}
-
-class InputDiscountOfOrder {
-    fun input(): Int? { //Функция ввода скидки в процентах
-        val discountOfOrder: Int?
-        println("Введите скидку за товар в процентах")
-        val str = readLine().toString()
-        discountOfOrder = str.toIntOrNull()
-        return discountOfOrder
+open class DeleteOrder1 {
+    open fun delete(indexForDelete: Int, listOfOnlineStoreDataBase: ArrayList<OnlineStoreDataBase>){
+        listOfOnlineStoreDataBase.removeAt(indexForDelete)
     }
 }
 
-interface HasCost {
-    var cost: Double
-}
-
-open class CostOfOrder(costOfOrder: Double) : HasCost {
-    override var cost: Double = costOfOrder
-}
-
-fun inputCorrectCostOfOrder(costOfOrder: Double) : Boolean { //Функция проверки цены на минимальное и максимальное значение
-    return costOfOrder > 0.0 && costOfOrder < Double.MAX_VALUE
-}
-
-fun outputErrorAboutIncorrectCost() { //Функция вывода ошибки о неправильно введёной цене
-    println("Вы ввели некорректную Цену")
-}
-
-fun validationCostOfOrder() : CostOfOrder { //Функция валидации цены
-    var resultInputCostOfOrder : Double?
-    do {
-        val inputCostOfOrder = InputCostOfOrder()
-        resultInputCostOfOrder = inputCostOfOrder.input()
-        if (resultInputCostOfOrder != null) {
-            if (!inputCorrectCostOfOrder(resultInputCostOfOrder))
-                outputErrorAboutIncorrectCost()
-        } else outputErrorAboutIncorrectCost()
-    } while (resultInputCostOfOrder == null || !inputCorrectCostOfOrder(resultInputCostOfOrder))
-    return CostOfOrder(resultInputCostOfOrder)
-}
-
-class InputCostOfOrder {
-    fun input(): Double? { //Функция ввода цены заказа
-        val costOfOrder: Double?
-            println("Введите цену за товар")
-            val str = readLine().toString()
-            costOfOrder = str.toDoubleOrNull()
-        return costOfOrder
-    }
-}
-
-interface HasName {
-    var name: String
-    var surname: String
-    var patronymic: String
-}
-
-open class Person(nameOfPerson: String, surnameOfPerson: String, patronymicOfPerson: String) : HasName {
-    override var name: String = nameOfPerson
-        set(value) {
-            if (value != "")
-            field = value
-        }
-    override var surname: String = surnameOfPerson
-        set(value) {
-            if (value != "")
-                field = value
-        }
-    override var patronymic: String = patronymicOfPerson
-        set(value) {
-            if (value != "")
-                field = value
-        }
-}
-
-fun inputCorrectNameSurnamePatronymic(stringToCheck : String) : Boolean { //Функция проверки правильности ввода ФИО
-    val result = Regex("([A-Za-zА-Яа-яёЁ-]*)")
-    return result.matches(stringToCheck)
-}
-
-fun validationNameSurnamePatronymicOfOrder() : Person { //Функция валидации ФИО
-    var resultInputNameOfOrder : String
-    var resultInputSurnameOfOrder : String
-    var resultInputPatronymicOfOrder : String
-
-    do {
-        val inputPerson = InputPerson()
-        resultInputNameOfOrder = inputPerson.inputName()
-        if (!inputCorrectNameSurnamePatronymic(resultInputNameOfOrder))
-            println("Вы ввели некорректное имя")
-    } while ((resultInputNameOfOrder == "") || !inputCorrectNameSurnamePatronymic(resultInputNameOfOrder))
-
-    do {
-        val inputPerson = InputPerson()
-        resultInputSurnameOfOrder = inputPerson.inputSurname()
-        if (!inputCorrectNameSurnamePatronymic(resultInputSurnameOfOrder))
-            println("Вы ввели некорректную фамилию")
-    } while ((resultInputSurnameOfOrder == "") || !inputCorrectNameSurnamePatronymic(resultInputSurnameOfOrder))
-    do {
-        val inputPerson = InputPerson()
-        resultInputPatronymicOfOrder = inputPerson.inputPatronymic()
-        if (!inputCorrectNameSurnamePatronymic(resultInputPatronymicOfOrder))
-            println("Вы ввели некорректное отчество")
-    } while (resultInputPatronymicOfOrder == "" && resultInputPatronymicOfOrder == cancellationAction || !inputCorrectNameSurnamePatronymic(resultInputPatronymicOfOrder))
-    if (resultInputPatronymicOfOrder == cancellationAction)
-        resultInputPatronymicOfOrder = ""
-    return Person(resultInputNameOfOrder, resultInputSurnameOfOrder, resultInputPatronymicOfOrder)
-}
-
-class InputPerson {
-    fun inputName(): String { //Ввод имени заказчика
-        println("Введите имя")
-        return readLine().toString().trim()
-    }
-    fun inputSurname() : String { //Ввод фамилии заказчика
-        println("Введите фамилию")
-        return readLine().toString().trim()
-    }
-    fun inputPatronymic() : String { //Ввод отчества заказчика
-        println("Введите отчество или  напишите '$cancellationAction' при его отсутствии")
-        return readLine().toString().trim()
-    }
-}
-
-class PrintAboutOrder {
-    fun print(ListOfPeopleOrder: ArrayList<String>, ListOfCostInformation: ArrayList<Double>,
-              ListOfDiscountInformation: ArrayList<Int>, ListOfAddress: ArrayList<String>) { //Функция вывода всей информации в базе данных
+open class PrintAboutOrder1 {
+    open fun print(listOfOnlineStoreDataBase: ArrayList<OnlineStoreDataBase>) {
         println("Вывод всей информации")
-        for (i in ListOfPeopleOrder.indices) {
-            print(ListOfPeopleOrder.indexOf(ListOfPeopleOrder[i]).toString() + ") " + "ФИО: " + ListOfPeopleOrder[i] + " ")
-            print("Стоимость: " + ListOfCostInformation[i].toString() + " ")
-            print("Скидка в процентах: " + ListOfDiscountInformation[i] + "% ")
-            println("Адрес: " + ListOfAddress[i])
+        for (i in listOfOnlineStoreDataBase.indices) {
+            println(i.toString() + ") ФИО: " + listOfOnlineStoreDataBase[i].surname + " " +
+                    listOfOnlineStoreDataBase[i].name + " " +
+                    listOfOnlineStoreDataBase[i].patronymic + " " +
+                    "Цена: " + listOfOnlineStoreDataBase[i].cost + " " +
+                    "Скидка: " + listOfOnlineStoreDataBase[i].discount + " " +
+                    "Адрес: " + listOfOnlineStoreDataBase[i].address)
         }
     }
 }
 
-class DeleteOrder {
-    fun delete(indexForDelete: Int, ListOfPeopleOrder: ArrayList<String>, ListOfCostInformation: ArrayList<Double>,
-               ListOfDiscountInformation: ArrayList<Int>, ListOfAddress: ArrayList<String>){
-        ListOfPeopleOrder.removeAt(indexForDelete)
-        ListOfCostInformation.removeAt(indexForDelete)
-        ListOfDiscountInformation.removeAt(indexForDelete)
-        ListOfAddress.removeAt(indexForDelete)
-    }
-}
 
-const val cancellationAction = "отмена"
 const val valueNeutral = -1
 const val valueOfExitingProgram = 0
 const val valueToAdd = 1
@@ -216,99 +163,56 @@ fun offerToEnterActionNumber() { //Функция выбора действия 
     println("Напишите - ${valueOfExitingProgram}, если хотите выйти из программы")
 }
 
-class InputOfferToEnterActionNumber {
-    fun input(): Int { //Функция проверки введённого числа для дейтсвия
-        var choosingAction : Int?
-        do {
-            val str = readLine()
-            choosingAction = str?.toIntOrNull()
-            if (choosingAction == null) {
-                println("Вы ввели не число, выберите из списка действие, которое хотите провести и введите число ещё раз")
-                offerToEnterActionNumber()
-            }
-            else if (choosingAction !in valueOfExitingProgram..valueToChangeOfRecords) {
-                println("Вы ввели число, которого нет в списке, выберите из списка действие, которое хотите провести и введите число ещё раз")
-                offerToEnterActionNumber()
-            }
-        } while (choosingAction == null)
-        return choosingAction
-    }
-}
-
-fun validationInputIndexToDelete(ListOfPeopleOrder: ArrayList<String>) : Int { //Функция валидации индекса списка для удаления
-    var flagListIndex = true
-    var countOfRemove: Int?
-    do {
-        val inputIndexToDelete = InputIndexToDelete()
-        countOfRemove = inputIndexToDelete.input()
-        if (countOfRemove != null)
-            if (countOfRemove == valueNeutral || countOfRemove in 0..ListOfPeopleOrder.size)
-                flagListIndex = false
-            else println("Нет номера такой записи")
-    } while (countOfRemove == null || flagListIndex)
-    return countOfRemove
-}
-
-class InputIndexToDelete {
-    fun input(): Int? { //Функция ввода индекса списка для удаления
-        println("Введите номер записи, которую вы хотите удалить или напиши '$valueNeutral' для отмены действия")
-        val stringCountOfRemove: String? = readLine()
-        return stringCountOfRemove?.toIntOrNull()
-    }
-}
-
-fun outputOfInformationDatabase() { //Функция вывода название базы данных
-    println("База данных заказов Интернет-магазина")
-}
+val listOfOnlineStoreDataBase : ArrayList<OnlineStoreDataBase> = arrayListOf()
 
 fun main() {
-
-    val listOfPerson : ArrayList<String> = arrayListOf()
-    val listOfCost : ArrayList<Double> = arrayListOf()
-    val listOfDiscount : ArrayList<Int> = arrayListOf()
-    val listOfAddressOfOrder : ArrayList<String> = arrayListOf()
-    outputOfInformationDatabase()
-    var resultOfInputOfferToEnterActionNumber = valueNeutral
+    var resultOfInputOfferToEnterActionNumber: Int? = valueNeutral
     while (resultOfInputOfferToEnterActionNumber != valueOfExitingProgram) {
         offerToEnterActionNumber()
-        val inputOfferToEnterActionNumber = InputOfferToEnterActionNumber()
-        resultOfInputOfferToEnterActionNumber = inputOfferToEnterActionNumber.input()
+        resultOfInputOfferToEnterActionNumber = LoopInput().input(
+            "Введите цифру из списка, чтобы сделать какое-то дейтсвие: ",
+            InputActionNumber(),
+            ValidateActionNumber())
+
         when (resultOfInputOfferToEnterActionNumber) {
             valueToAdd -> {
-                val resultInputPerson = validationNameSurnamePatronymicOfOrder()
-                val person = Person(resultInputPerson.name, resultInputPerson.surname, resultInputPerson.patronymic)
 
-                val resultInputCostOfOrder = validationCostOfOrder()
-                val costOfOrder = CostOfOrder(resultInputCostOfOrder.cost)
+                val resultOnlineStoreDataBase =
+                    OnlineStoreDataBase(NameOfOrder1(LoopInput().input("Введите имя: ",
+                        InputNameOrSurnameOfPatronymic(), ValidateNameSurnamePatronymic())).name,
 
-                val resultInputDiscountOfOrder = validationDiscountOfOrder()
-                val discountOfOrder = DiscountOfOrder(resultInputDiscountOfOrder.discount)
+                        SurnameOfOrder1(LoopInput().input("Введите фамилию: ",
+                            InputNameOrSurnameOfPatronymic(), ValidateNameSurnamePatronymic())).surname,
 
-                val resultInputAddressOfOrder = validationAddressOfOrder()
-                val addressOfOrder = AddressOfOrder(resultInputAddressOfOrder.address)
+                        PatronymicOfOrder1(LoopInput().input("Введите отчество: ",
+                            InputNameOrSurnameOfPatronymic(), ValidateNameSurnamePatronymic())).patronymic,
 
-                listOfPerson.add(person.name + " " + person.surname + " " + person.patronymic)
-                listOfCost.add(costOfOrder.cost)
-                listOfDiscount.add(discountOfOrder.discount)
-                listOfAddressOfOrder.add(addressOfOrder.address)
+                        CostOfOrder1(LoopInput().input("Введите цену: ",
+                            InputCost(), ValidateCost())).cost,
+
+                        DiscountOfOrder1(LoopInput().input("Введите скидку: ",
+                            InputDiscount(), ValidateDiscount())).discount,
+
+                        AddressOfOrder1(LoopInput().input("Введите адрес: ",
+                            InputAddress(), ValidateAddress())).address)
+
+                listOfOnlineStoreDataBase.add(resultOnlineStoreDataBase)
             }
             valueToOutputOfRecords -> {
-                val printAboutOrder = PrintAboutOrder()
-                printAboutOrder.print(listOfPerson, listOfCost, listOfDiscount, listOfAddressOfOrder)
+                val printAboutOrder = PrintAboutOrder1()
+                printAboutOrder.print(listOfOnlineStoreDataBase)
             }
             valueToDeleteOfRecords -> {
-                val deleteOrder = DeleteOrder()
-                if (listOfPerson.size != 0) {
-                    val countOfRemove = validationInputIndexToDelete(listOfPerson)
-                    if (countOfRemove != valueNeutral) {
-                        deleteOrder.delete(countOfRemove, listOfPerson, listOfCost, listOfDiscount, listOfAddressOfOrder)
-                        println("Данные удалены")
-                    }
+                val deleteOrder = DeleteOrder1()
+                if (listOfOnlineStoreDataBase.size > 0 ) {
+                    val countOfRemove = LoopInput().input("Введите номер для удаления записи: ",
+                        InputIndexToDelete1(), ValidateIndexForRemove())
+                    if (countOfRemove != null)
+                        deleteOrder.delete(countOfRemove, listOfOnlineStoreDataBase)
+                    println("Данные удалены")
                 }
                 else
                     println("Записей нет")
-            }
-            valueToChangeOfRecords -> {
             }
         }
     }
