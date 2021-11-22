@@ -183,10 +183,28 @@ class FieldChangeInTheList {
     }
 }
 
+class FieldSearchInTheList {
+    fun <T> search(field: String, valueFilter: T) { //Переделать под map лямбду {}
+        when (field) {
+            selectNameToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.name == valueFilter } as ArrayList<OnlineStoreDataBase>)
+
+            selectSurnameToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.surname == valueFilter } as ArrayList<OnlineStoreDataBase>)
+
+            selectPatronymicToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.patronymic == valueFilter } as ArrayList<OnlineStoreDataBase>)
+
+            selectCostToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.cost == valueFilter } as ArrayList<OnlineStoreDataBase>)
+
+            selectDiscountToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.discount == valueFilter } as ArrayList<OnlineStoreDataBase>)
+
+            selectAddressToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.address == valueFilter } as ArrayList<OnlineStoreDataBase>)
+        }
+    }
+}
+
 class FieldFilterInTheList {
     fun filter(field: String) {
         when (field) {
-            selectNameToChangeTheField -> {listOfOnlineStoreDataBase.sortedBy { x -> x.name }
+            selectNameToChangeTheField -> { listOfOnlineStoreDataBase.sortedBy { x -> x.name }
                 for (i in listOfOnlineStoreDataBase.indices) {
                     println(i.toString() + ") ФИО: " + listOfOnlineStoreDataBase[i].surname + " " +
                             listOfOnlineStoreDataBase[i].name + " " +
@@ -209,24 +227,6 @@ class FieldFilterInTheList {
     }
 }
 
-class FieldSearchInTheList {
-    fun <T> search(field: String, valueFilter: T) {
-        when (field) {
-            selectNameToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.name == valueFilter } as ArrayList<OnlineStoreDataBase>)
-
-            selectSurnameToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.surname == valueFilter } as ArrayList<OnlineStoreDataBase>)
-
-            selectPatronymicToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.patronymic == valueFilter } as ArrayList<OnlineStoreDataBase>)
-
-            selectCostToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.cost == valueFilter } as ArrayList<OnlineStoreDataBase>)
-
-            selectDiscountToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.discount == valueFilter } as ArrayList<OnlineStoreDataBase>)
-
-            selectAddressToChangeTheField -> PrintAboutOrder().print(listOfOnlineStoreDataBase.filter { x -> x.address == valueFilter } as ArrayList<OnlineStoreDataBase>)
-        }
-    }
-}
-
 
 const val valueNeutral = -1
 const val valueOfExitingProgram = 0
@@ -244,7 +244,7 @@ const val selectCostToChangeTheField = "Цена"
 const val selectDiscountToChangeTheField = "Скидка"
 const val selectAddressToChangeTheField = "Адрес"
 
-fun offerToEnterActionNumber() {
+fun offerToEnterActionNumber() { //ListIsTriple число/ формулировка путкла/ лямбда
     println("Напишите - ${valueToAdd}, если хотите добавить запись")
     println("Напишите - ${valueToOutputOfRecords}, если хотите вывести все записи")
     println("Напишите - ${valueToDeleteOfRecords}, если хотите удалить запись")
