@@ -127,12 +127,12 @@ open class ValidateSizeOfList : IValidate<Int> {
 }
 
 open class ValidateFieldToChangeOrSearch : IValidate<String> {
-    override fun validate(value: String?): Boolean = value == selectNameToChangeTheField ||
-                                                     value == selectSurnameToChangeTheField ||
-                                                     value == selectPatronymicToChangeTheField ||
-                                                     value == selectCostToChangeTheField ||
-                                                     value == selectDiscountToChangeTheField ||
-                                                     value == selectAddressToChangeTheField
+    override fun validate(value: String?): Boolean = value == selectNameToChangeFilterSearchTheField ||
+                                                     value == selectSurnameToChangeFilterSearchTheField ||
+                                                     value == selectPatronymicToChangeFilterSearchTheField ||
+                                                     value == selectCostToChangeFilterSearchTheField ||
+                                                     value == selectDiscountToChangeFilterSearchTheField ||
+                                                     value == selectAddressToChangeFilterSearchTheField
 }
 
 open class LoopInput {
@@ -153,8 +153,8 @@ open class DeleteOrder {
     }
 }
 
-open class PrintAboutOrder {
-    open fun print(listOfOnlineStoreDataBase: ArrayList<OnlineStoreDataBase>) {
+open class PrintAllInformation {
+    open fun print() {
         println("Вывод всей информации")
         for (i in listOfOnlineStoreDataBase.indices) {
             println(i.toString() + ") ФИО: " + listOfOnlineStoreDataBase[i].surname + " " +
@@ -170,18 +170,26 @@ open class PrintAboutOrder {
 class FieldChangeInTheList {
     fun <T> change(index: Int, field: String, valueChange: T) {
         when (field) {
-            selectNameToChangeTheField -> listOfOnlineStoreDataBase[index].name = valueChange.toString()
+            selectNameToChangeFilterSearchTheField -> listOfOnlineStoreDataBase[index].name = valueChange.toString()
 
-            selectSurnameToChangeTheField -> listOfOnlineStoreDataBase[index].surname = valueChange.toString()
+            selectSurnameToChangeFilterSearchTheField -> listOfOnlineStoreDataBase[index].surname = valueChange.toString()
 
-            selectPatronymicToChangeTheField -> listOfOnlineStoreDataBase[index].patronymic = valueChange.toString()
+            selectPatronymicToChangeFilterSearchTheField -> listOfOnlineStoreDataBase[index].patronymic = valueChange.toString()
 
-            selectCostToChangeTheField -> listOfOnlineStoreDataBase[index].cost = valueChange.toString().toDoubleOrNull()
+            selectCostToChangeFilterSearchTheField -> listOfOnlineStoreDataBase[index].cost = valueChange.toString().toDoubleOrNull()
 
-            selectDiscountToChangeTheField -> listOfOnlineStoreDataBase[index].discount = valueChange.toString().toIntOrNull()
+            selectDiscountToChangeFilterSearchTheField -> listOfOnlineStoreDataBase[index].discount = valueChange.toString().toIntOrNull()
 
-            selectAddressToChangeTheField -> listOfOnlineStoreDataBase[index].patronymic = valueChange.toString()
+            selectAddressToChangeFilterSearchTheField -> listOfOnlineStoreDataBase[index].patronymic = valueChange.toString()
          }
+    }
+}
+
+class FieldFilterInTheList {
+    fun filter(list: MutableMap<String, out (OnlineStoreDataBase) -> Any?>, fieldOfListForFilter: String) {
+        val t = (list[fieldOfListForFilter])
+        if (t != null)
+        PrintSearchAndFilterInformation().print(listOfOnlineStoreDataBase.sortedBy(t as (OnlineStoreDataBase) -> Comparable<Any>?))
     }
 }
 
@@ -193,27 +201,25 @@ class FieldSearchInTheList {
     ) {
         val mapForResult = map[selectNameToChangeTheField]
         if (mapForResult != null)
-            PrintAboutOrder().print(listOfOnlineStoreDataBase.filter(mapForResult(valueSearch))  as ArrayList<OnlineStoreDataBase>)
+            PrintSearchAndFilterInformation().print(listOfOnlineStoreDataBase.filter(mapForResult(valueSearch)))
     }
 }
 
-class FieldFilterInTheList {
-    fun filter() {
-            val t = listOfOnlineStoreDataBase.sortedBy{ x -> x.name }
-            PrintAboutOrder1().print(t)
-    }
-}
-
-open class PrintAboutOrder1 {
-    open fun print(t: List<OnlineStoreDataBase>) {
+open class PrintSearchAndFilterInformation {
+    open fun print(list: List<OnlineStoreDataBase>) {
         println("Вывод всей информации")
-        for (i in t) {
-            println(i.toString() + ") ФИО: " + i.surname + " " +
+        for ((count, i) in list.withIndex()) {
+            println(count.toString() +
+                    ") ФИО: " +
+                    i.surname + " " +
                     i.name + " " +
                     i.patronymic + " " +
-                    "Цена: " + i.cost + " " +
-                    "Скидка: " + i.discount + " " +
-                    "Адрес: " + i.address)
+                    "Цена: " +
+                    i.cost + " " +
+                    "Скидка: " +
+                    i.discount + " " +
+                    "Адрес: " +
+                    i.address)
         }
     }
 }
@@ -227,12 +233,12 @@ const val valueToChangeOfRecords = 4
 const val valueToFilterOfRecords = 5
 const val valueToSearchOfRecords = 6
 
-const val selectNameToChangeTheField = "Имя"
-const val selectSurnameToChangeTheField = "Фамилия"
-const val selectPatronymicToChangeTheField = "Отчество"
-const val selectCostToChangeTheField = "Цена"
-const val selectDiscountToChangeTheField = "Скидка"
-const val selectAddressToChangeTheField = "Адрес"
+const val selectNameToChangeFilterSearchTheField = "Имя"
+const val selectSurnameToChangeFilterSearchTheField = "Фамилия"
+const val selectPatronymicToChangeFilterSearchTheField = "Отчество"
+const val selectCostToChangeFilterSearchTheField = "Цена"
+const val selectDiscountToChangeFilterSearchTheField = "Скидка"
+const val selectAddressToChangeFilterSearchTheField = "Адрес"
 
 fun offerToEnterActionNumber() { //ListIsTriple число/ формулировка путкла/ лямбда
     println("Напишите - ${valueToAdd}, если хотите добавить запись")
@@ -246,12 +252,27 @@ fun offerToEnterActionNumber() { //ListIsTriple число/ формулиров
 //val t = listOf(Triple(valueToAdd, "Если хотите добавить запись", ))
 val listOfOnlineStoreDataBase : ArrayList<OnlineStoreDataBase> = arrayListOf()
 
-val map = mutableMapOf(selectNameToChangeTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.name == valueSearch}},
-    selectSurnameToChangeTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.surname == valueSearch}},
-    selectPatronymicToChangeTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.patronymic == valueSearch}},
-    selectCostToChangeTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.cost.toString() == valueSearch}},
-    selectDiscountToChangeTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.discount.toString() == valueSearch}},
-    selectAddressToChangeTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.address == valueSearch}})
+val mapForSearch = mutableMapOf(
+    selectNameToChangeFilterSearchTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.name == valueSearch}},
+    selectSurnameToChangeFilterSearchTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.surname == valueSearch}},
+    selectPatronymicToChangeFilterSearchTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.patronymic == valueSearch}},
+    selectCostToChangeFilterSearchTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.cost.toString() == valueSearch}},
+    selectDiscountToChangeFilterSearchTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.discount.toString() == valueSearch}},
+    selectAddressToChangeFilterSearchTheField to {valueSearch: String -> {x: OnlineStoreDataBase -> x.address == valueSearch}}
+)
+
+val mapForFilter = mutableMapOf(
+    selectNameToChangeFilterSearchTheField to {x: OnlineStoreDataBase -> x.name as String?},
+    selectSurnameToChangeFilterSearchTheField to {x: OnlineStoreDataBase -> x.surname as String?},
+    selectPatronymicToChangeFilterSearchTheField to {x: OnlineStoreDataBase -> x.patronymic as String?},
+    selectCostToChangeFilterSearchTheField to {x: OnlineStoreDataBase -> x.cost as Double?},
+    selectDiscountToChangeFilterSearchTheField to {x: OnlineStoreDataBase -> x.discount as Int?},
+    selectAddressToChangeFilterSearchTheField to {x: OnlineStoreDataBase -> x.address as String?}
+)
+
+val mapMenu = mutableMapOf(
+    valueToAdd to {x: OnlineStoreDataBase -> }
+)
 
 fun main() {
     var resultOfInputOfferToEnterActionNumber: Int? = valueNeutral
@@ -266,55 +287,55 @@ fun main() {
         when (resultOfInputOfferToEnterActionNumber) {
 
             valueToAdd -> {
-                val resultOnlineStoreDataBase =
-                    OnlineStoreDataBase(
-                        NameOfOrder(
-                            LoopInput().input(
-                                "Введите имя: ",
-                                InputNameOrSurnameOfPatronymic(), ValidateNameSurnamePatronymic()
-                            )
-                        ).name,
+                val resultOnlineStoreDataBase = OnlineStoreDataBase(
+                    NameOfOrder(
+                        LoopInput().input(
+                            "Введите имя: ",
+                            InputNameOrSurnameOfPatronymic(), ValidateNameSurnamePatronymic()
+                        )
+                    ).name,
 
-                        SurnameOfOrder(
-                            LoopInput().input(
-                                "Введите фамилию: ",
-                                InputNameOrSurnameOfPatronymic(), ValidateNameSurnamePatronymic()
-                            )
-                        ).surname,
+                    SurnameOfOrder(
+                        LoopInput().input(
+                            "Введите фамилию: ",
+                            InputNameOrSurnameOfPatronymic(), ValidateNameSurnamePatronymic()
+                        )
+                    ).surname,
 
-                        PatronymicOfOrder(
-                            LoopInput().input(
-                                "Введите отчество: ",
-                                InputNameOrSurnameOfPatronymic(), ValidateNameSurnamePatronymic()
-                            )
-                        ).patronymic,
+                    PatronymicOfOrder(
+                        LoopInput().input(
+                            "Введите отчество: ",
+                            InputNameOrSurnameOfPatronymic(), ValidateNameSurnamePatronymic()
+                        )
+                    ).patronymic,
 
-                        CostOfOrder(
-                            LoopInput().input(
-                                "Введите цену: ",
-                                InputCost(), ValidateCost()
-                            )
-                        ).cost,
+                    CostOfOrder(
+                        LoopInput().input(
+                            "Введите цену: ",
+                            InputCost(), ValidateCost()
+                        )
+                    ).cost,
 
-                        DiscountOfOrder(
-                            LoopInput().input(
-                                "Введите скидку: ",
-                                InputDiscount(), ValidateDiscount()
-                            )
-                        ).discount,
+                    DiscountOfOrder(
+                        LoopInput().input(
+                            "Введите скидку: ",
+                            InputDiscount(), ValidateDiscount()
+                        )
+                    ).discount,
 
-                        AddressOfOrder(
-                            LoopInput().input(
-                                "Введите адрес: ",
-                                InputAddress(), ValidateAddress()
-                            )
-                        ).address
-                    )
+                    AddressOfOrder(
+                        LoopInput().input(
+                            "Введите адрес: ",
+                            InputAddress(), ValidateAddress()
+                        )
+                    ).address
+                )
+
                 listOfOnlineStoreDataBase.add(resultOnlineStoreDataBase)
             }
 
             valueToOutputOfRecords -> {
-                PrintAboutOrder().print(listOfOnlineStoreDataBase)
+                PrintAllInformation().print()
             }
 
             valueToDeleteOfRecords -> {
@@ -340,18 +361,18 @@ fun main() {
                     )
 
                     val fieldOfListForChange = LoopInput().input(
-                        "Напишите - ${selectNameToChangeTheField}, чтобы изменить имя в базе данных " + "\n" +
-                                "Напишите - ${selectSurnameToChangeTheField}, чтобы изменить фамилию в базе данных " + "\n" +
-                                "Напишите - ${selectPatronymicToChangeTheField}, если изменить отчество в базе данных " + "\n" +
-                                "Напишите - ${selectCostToChangeTheField}, чтобы изменить цену в базе данных " + "\n" +
-                                "Напишите - ${selectDiscountToChangeTheField}, чтобы изменить скидку в базе данных" + "\n" +
-                                "Напишите - ${selectAddressToChangeTheField}, чтобы изменить адрес в базе данных" + "\n",
+                        "Напишите - ${selectNameToChangeFilterSearchTheField}, чтобы изменить имя в базе данных " + "\n" +
+                                "Напишите - ${selectSurnameToChangeFilterSearchTheField}, чтобы изменить фамилию в базе данных " + "\n" +
+                                "Напишите - ${selectPatronymicToChangeFilterSearchTheField}, если изменить отчество в базе данных " + "\n" +
+                                "Напишите - ${selectCostToChangeFilterSearchTheField}, чтобы изменить цену в базе данных " + "\n" +
+                                "Напишите - ${selectDiscountToChangeFilterSearchTheField}, чтобы изменить скидку в базе данных" + "\n" +
+                                "Напишите - ${selectAddressToChangeFilterSearchTheField}, чтобы изменить адрес в базе данных" + "\n",
                         InputFieldToChangeOrSearch(),
                         ValidateFieldToChangeOrSearch()
                     )
                     if (indexOfListForChange != null && fieldOfListForChange != null) {
                         when (fieldOfListForChange) {
-                            selectNameToChangeTheField ->
+                            selectNameToChangeFilterSearchTheField ->
                                 FieldChangeInTheList().change(
                                     indexOfListForChange,
                                     fieldOfListForChange,
@@ -362,7 +383,7 @@ fun main() {
                                     )
                                 )
 
-                            selectSurnameToChangeTheField ->
+                            selectSurnameToChangeFilterSearchTheField ->
                                 FieldChangeInTheList().change(
                                     indexOfListForChange,
                                     fieldOfListForChange,
@@ -373,7 +394,7 @@ fun main() {
                                     )
                                 )
 
-                            selectPatronymicToChangeTheField ->
+                            selectPatronymicToChangeFilterSearchTheField ->
                                 FieldChangeInTheList().change(
                                     indexOfListForChange,
                                     fieldOfListForChange,
@@ -384,7 +405,7 @@ fun main() {
                                     )
                                 )
 
-                            selectCostToChangeTheField ->
+                            selectCostToChangeFilterSearchTheField ->
                                 FieldChangeInTheList().change(
                                     indexOfListForChange,
                                     fieldOfListForChange,
@@ -395,7 +416,7 @@ fun main() {
                                     )
                                 )
 
-                            selectDiscountToChangeTheField ->
+                            selectDiscountToChangeFilterSearchTheField ->
                                 FieldChangeInTheList().change(
                                     indexOfListForChange,
                                     fieldOfListForChange,
@@ -406,7 +427,7 @@ fun main() {
                                     )
                                 )
 
-                            selectAddressToChangeTheField ->
+                            selectAddressToChangeFilterSearchTheField ->
                                 FieldChangeInTheList().change(
                                     indexOfListForChange,
                                     fieldOfListForChange,
@@ -423,36 +444,32 @@ fun main() {
 
             valueToFilterOfRecords -> {
                 val fieldOfListForFilter = LoopInput().input(
-                    "Напишите - ${selectNameToChangeTheField}, чтобы произвести поиск имени в базе данных " + "\n" +
-                            "Напишите - ${selectSurnameToChangeTheField}, чтобы произвести поиск фамилии в базе данных " + "\n" +
-                            "Напишите - ${selectPatronymicToChangeTheField}, если произвести поиск отчеству в базе данных " + "\n" +
-                            "Напишите - ${selectCostToChangeTheField}, чтобы произвести поиск по цене в базе данных " + "\n" +
-                            "Напишите - ${selectDiscountToChangeTheField}, чтобы произвести поиск скидке в базе данных" + "\n" +
-                            "Напишите - ${selectAddressToChangeTheField}, чтобы произвести поиск адресу в базе данных" + "\n",
+                    "Напишите - ${selectNameToChangeFilterSearchTheField}, чтобы произвести поиск имени в базе данных " + "\n" +
+                            "Напишите - ${selectSurnameToChangeFilterSearchTheField}, чтобы произвести поиск фамилии в базе данных " + "\n" +
+                            "Напишите - ${selectPatronymicToChangeFilterSearchTheField}, если произвести поиск отчеству в базе данных " + "\n" +
+                            "Напишите - ${selectCostToChangeFilterSearchTheField}, чтобы произвести поиск по цене в базе данных " + "\n" +
+                            "Напишите - ${selectDiscountToChangeFilterSearchTheField}, чтобы произвести поиск скидке в базе данных" + "\n" +
+                            "Напишите - ${selectAddressToChangeFilterSearchTheField}, чтобы произвести поиск адресу в базе данных" + "\n",
                     InputFieldToChangeOrSearch(),
                     ValidateFieldToChangeOrSearch()
                 )
-                FieldFilterInTheList().filter()
-                when(fieldOfListForFilter) {
-                    selectNameToChangeTheField -> {
-                            //FieldFilterInTheList().filter(map, fieldOfListForFilter)
-                    }
-                }
+                if (fieldOfListForFilter != null)
+                    FieldFilterInTheList().filter(mapForFilter, fieldOfListForFilter)
             }
             valueToSearchOfRecords -> {
                 val fieldOfListForSearch = LoopInput().input(
-                    "Напишите - ${selectNameToChangeTheField}, чтобы произвести поиск имени в базе данных " + "\n" +
-                            "Напишите - ${selectSurnameToChangeTheField}, чтобы произвести поиск фамилии в базе данных " + "\n" +
-                            "Напишите - ${selectPatronymicToChangeTheField}, если произвести поиск отчеству в базе данных " + "\n" +
-                            "Напишите - ${selectCostToChangeTheField}, чтобы произвести поиск по цене в базе данных " + "\n" +
-                            "Напишите - ${selectDiscountToChangeTheField}, чтобы произвести поиск скидке в базе данных" + "\n" +
-                            "Напишите - ${selectAddressToChangeTheField}, чтобы произвести поиск адресу в базе данных" + "\n",
+                    "Напишите - ${selectNameToChangeFilterSearchTheField}, чтобы произвести поиск имени в базе данных " + "\n" +
+                            "Напишите - ${selectSurnameToChangeFilterSearchTheField}, чтобы произвести поиск фамилии в базе данных " + "\n" +
+                            "Напишите - ${selectPatronymicToChangeFilterSearchTheField}, если произвести поиск отчеству в базе данных " + "\n" +
+                            "Напишите - ${selectCostToChangeFilterSearchTheField}, чтобы произвести поиск по цене в базе данных " + "\n" +
+                            "Напишите - ${selectDiscountToChangeFilterSearchTheField}, чтобы произвести поиск скидке в базе данных" + "\n" +
+                            "Напишите - ${selectAddressToChangeFilterSearchTheField}, чтобы произвести поиск адресу в базе данных" + "\n",
                     InputFieldToChangeOrSearch(),
                     ValidateFieldToChangeOrSearch()
                 )
 
                 when (fieldOfListForSearch) {
-                    selectNameToChangeTheField -> {
+                    selectNameToChangeFilterSearchTheField -> {
 
                         val resultLoopInput = LoopInput().input(
                             "Введите имя: ",
@@ -461,9 +478,9 @@ fun main() {
                         )
 
                         if (resultLoopInput != null)
-                        FieldSearchInTheList().search(map, resultLoopInput, selectNameToChangeTheField)
+                            FieldSearchInTheList().search(mapForSearch, resultLoopInput, selectNameToChangeFilterSearchTheField)
                     }
-                    selectSurnameToChangeTheField -> {
+                    selectSurnameToChangeFilterSearchTheField -> {
 
                         val resultLoopInput = LoopInput().input(
                             "Введите фамилию: ",
@@ -472,9 +489,9 @@ fun main() {
                         )
 
                         if (resultLoopInput != null)
-                            FieldSearchInTheList().search(map, resultLoopInput, selectSurnameToChangeTheField)
+                            FieldSearchInTheList().search(mapForSearch, resultLoopInput, selectSurnameToChangeFilterSearchTheField)
                     }
-                    selectPatronymicToChangeTheField -> {
+                    selectPatronymicToChangeFilterSearchTheField -> {
 
                         val resultLoopInput = LoopInput().input(
                             "Введите отчество: ",
@@ -483,9 +500,9 @@ fun main() {
                         )
 
                         if (resultLoopInput != null)
-                            FieldSearchInTheList().search(map, resultLoopInput, selectPatronymicToChangeTheField)
+                            FieldSearchInTheList().search(mapForSearch, resultLoopInput, selectPatronymicToChangeFilterSearchTheField)
                     }
-                    selectCostToChangeTheField -> {
+                    selectCostToChangeFilterSearchTheField -> {
 
                         val resultLoopInput = LoopInput().input(
                             "Введите цену: ",
@@ -494,9 +511,9 @@ fun main() {
                         )
 
                         if (resultLoopInput != null)
-                            FieldSearchInTheList().search(map, resultLoopInput.toString(), selectCostToChangeTheField)
+                            FieldSearchInTheList().search(mapForSearch, resultLoopInput.toString(), selectCostToChangeFilterSearchTheField)
                     }
-                    selectDiscountToChangeTheField -> {
+                    selectDiscountToChangeFilterSearchTheField -> {
 
                         val resultLoopInput = LoopInput().input(
                             "Введите скидку: ",
@@ -505,9 +522,9 @@ fun main() {
                         )
 
                         if (resultLoopInput != null)
-                            FieldSearchInTheList().search(map, resultLoopInput.toString(), selectDiscountToChangeTheField)
+                            FieldSearchInTheList().search(mapForSearch, resultLoopInput.toString(), selectDiscountToChangeFilterSearchTheField)
                     }
-                    selectAddressToChangeTheField -> {
+                    selectAddressToChangeFilterSearchTheField -> {
 
                         val resultLoopInput = LoopInput().input(
                             "Введите адрес: ",
@@ -516,7 +533,7 @@ fun main() {
                         )
 
                         if (resultLoopInput != null)
-                            FieldSearchInTheList().search(map, resultLoopInput, selectAddressToChangeTheField)
+                            FieldSearchInTheList().search(mapForSearch, resultLoopInput, selectAddressToChangeFilterSearchTheField)
                     }
                 }
             }
