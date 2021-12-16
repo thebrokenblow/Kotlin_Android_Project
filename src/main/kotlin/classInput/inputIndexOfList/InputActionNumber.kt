@@ -1,4 +1,4 @@
-package classInput
+package classInput.inputIndexOfList
 
 import interfaceInput.IInput
 import javax.inject.Inject
